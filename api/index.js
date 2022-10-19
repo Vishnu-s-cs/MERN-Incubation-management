@@ -7,6 +7,7 @@ const cors = require("cors");
 const authRouter=require('./routes/auth')
 const userRouter=require('./routes/user')
 const adminRouter=require('./routes/admin')
+const cookieParser = require('cookie-parser');
 
 dotenv.config()
 
@@ -15,8 +16,10 @@ mongoose.connect(
     ).then(()=>console.log('db connection is succesffull'))
     .catch((err)=>console.log(err)
 )
-
+app.use(cookieParser());
 app.use(express.json());
+
+// app.use(express.cookieParser());
 app.use(
   cors({
     origin: "*",

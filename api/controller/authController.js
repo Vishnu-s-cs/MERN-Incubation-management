@@ -8,16 +8,16 @@ const jwt=require('jsonwebtoken')
 //register
 
 const User_register=async(req,res)=>{
-    const newUser=new User({
-        name:req.body.name,
-        password:Cryptojs.AES.encrypt(req.body.password, process.env.PASS_SEC).toString(),
-        email:req.body.email,
-        company:req.body.company
+
+  try{  const newUser=new User({
+        name:req.body.username,
+        password:Cryptojs.AES.encrypt(req.body.password, process.env.PASS_KEY).toString(),
+        email:req.body.email
     })
-    try{
        const savedUser   = await newUser.save()
        res.status(201).json(savedUser)
     }catch(err){
+        console.log(err);
         res.status(500).json(err);
     }
 
@@ -33,24 +33,22 @@ const user_Login=async(req,res)=>{
         !user&& res.status(401).json("wrong credentials")
         const hashedPassword=Cryptojs.AES.decrypt(
 
-            user.password,process.env.PASS_SEC 
+            user.password,process.env.PASS_KEY 
             );
-      const  Originalpassword=hashedPassword.toString(Cryptojs.enc.Utf8)
-        Originalpassword != req.body.password && 
+      const  OriginalPassword=hashedPassword.toString(Cryptojs.enc.Utf8)
+        OriginalPassword != req.body.password && 
         res.status(401).json("wrong credentials!")
             //setting jwt token
-            console.log(user);
+            // console.log(user);
         const accessToken=jwt.sign({
             id:user._id,
            
-        },process.env.JWT_SEC,{expiresIn:"3d"}
+        },process.env.JWT_SECRET,{expiresIn:"3d"}
         );
 
-
         const {password,...others}=user._doc//mongo db stores it file in _doc so we use ._doc
-
-
-        res.status(200).json({...others,accessToken})
+         
+        res.status(202).json({...others,accessToken});
     }catch(err){
         res.status(500),json(err)
     }
