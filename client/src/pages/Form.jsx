@@ -51,81 +51,122 @@ function Form() {
     incubation_type: "",
     proposal: "",
   })
-  // const handleFocus = (e) => {
-  //   setFocused(true);
-  // };
-  function handleSubmit(e) {
-    e.preventDefault()
-    try {
-      if (!application.name) {
-        setErrorMessage("Name is required");
-      } else if (application.name.length < 3) {
-        setErrorMessage("Name must be atleast 3 characters");
-      } else if (!application.name.match(/^[A-Za-z][A-Za-z ]*$/)) {
-        setErrorMessage("Enter a valid name");
-      } else if (!application.phone) {
-        setErrorMessage(null); 
-        setErrorMessage1("Phone is required");
-      } else if (application.phone.match(/[^0-9]/g)) {
-        setErrorMessage1("Enter a valid Phone number");
-      } else if (application.phone.length !== 10) {
-        setErrorMessage1("Phone must be 10 characters");
-      } else if (!application.email) {
-        setErrorMessage1(null); 
-
-        setErrorMessage2("Email is required");
-      } else if (!application.email.match(/^[A-Za-z0-9._-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$/)) {
-        setErrorMessage2("Enter a valid email");
-      } else if (!application.city) {
-        setErrorMessage2(null);
-
-        setErrorMessage3("City is required");
-      } else if (!application.state) {
-        setErrorMessage3(null);
-
-        setErrorMessage4("State is required");
-      } else if (!application.address) {
-        setErrorMessage4(null);
-        
-        setErrorMessage5("Address is required");
-      } else if (!application.company_name) {
-        setErrorMessage5(null);
-
-        setErrorMessage6("Company name is required");
-      } else if (!image) {
-        setErrorMessage6(null);
-
-        setErrorMessage7("Company logo is required");
-      } else if (!application.team_and_bg || !application.company_and_products || !application.problem || !application.solution || !application.value_proposition || !application.revenue_model || !application.market_size || !application.market_plan || !application.incubation_type || !application.proposal) {
-        setErrorMessage7(null);
-       
-        setErrorMessage8("All fields are required");
-      } else {
-
-
-
-        Axios.post(`${userUrl}/api/users/upload/${userDetails._id}`, { ...application} ).then((response) => {
-          localStorage.setItem('user', JSON.stringify(response.data))
-          setUserDetails(response.data)
-          console.log(response.data + "this is response after update");
-          navigate('/')
-        }).catch((err) => {
-          console.log('error')
-          Swal.fire({
-            title: 'Error!',
-            text: 'please recheck credentials',
-            icon: 'error',
-            confirmButtonText: 'ok'
-          })
-        })
-      }
-
-    } catch (error) {
-      console.log(error.message);
+  function validateName(){
+    if (!application.name) {
+      setErrorMessage("Name is required");
+      return false;
+    } 
+    if (application.name.length < 3) {
+      setErrorMessage("Name must be atleast 3 characters");
+      return false;
     }
+    if (!application.name.match(/^[A-Za-z][A-Za-z ]*$/)) {
+          setErrorMessage("Enter a valid name");
+      return false;
+        }
+    setErrorMessage(null)
+    return true
   }
 
+  function validateAddress(){
+    if (!application.address) {
+          setErrorMessage5("Address is required");
+          return false
+        }
+    setErrorMessage5(null)
+    return true
+  }
+
+  function validateCity(){
+      if (!application.city) {
+          setErrorMessage3("City is required");
+          return false
+        }
+        setErrorMessage3(null); 
+        return true
+  }
+
+  function validateState(){ 
+    if (!application.state) {
+          setErrorMessage4("State is required");
+        return false
+      }
+      setErrorMessage4(null); 
+      return true
+    }
+
+function validateEmail(){
+  if (!application.email) {
+    setErrorMessage2("Email is required");
+    return false;
+  } else if (!application.email.match(/^[A-Za-z0-9._-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$/)) {
+    setErrorMessage2("Enter a valid email");
+    return false;
+  } 
+  setErrorMessage2(null); 
+  return true;
+}
+
+function validatePhone(){
+  if (!application.phone) {   
+    setErrorMessage1("Phone is required");
+    return false;  
+  } else if (application.phone.match(/[^0-9]/g)) {
+    setErrorMessage1("Enter a valid Phone number");
+    return false; 
+  } else if (application.phone.length !== 10) {
+    setErrorMessage1("Phone must be 10 characters");
+    return false; 
+  } 
+  setErrorMessage1(null);  
+  return true;           
+}
+
+function validateCompanyName(){
+  if (!application.company_name) {
+    setErrorMessage6("Company name is required");
+    return false;
+  }
+  setErrorMessage6(null);
+  return true;  
+}
+
+function validateimage(){
+  if (!image) {
+    setErrorMessage7("Company logo is required");
+    return false;
+  }
+  setErrorMessage7(null);
+  return true;  
+}
+
+
+
+
+  function handleSubmit(e) {
+    if(!validateName()||!validateAddress()||!validateCity()||!validateState()|| !validateEmail()||!validatePhone()||!validateCompanyName()||!validateimage()||!application.team_and_bg || !application.company_and_products || !application.problem || !application.solution || !application.value_proposition || !application.revenue_model || !application.market_size || !application.market_plan || !application.incubation_type || !application.proposal){
+      e.preventDefault()
+      setErrorMessage8("all fields are required")
+    }else{
+      e.preventDefault()
+      Axios.post(`${userUrl}/api/users/upload/${userDetails._id}`, { ...application} ).then((response) => {
+              localStorage.setItem('user', JSON.stringify(response.data))
+              setUserDetails(response.data)
+              console.log(response.data + "this is response after update");
+              navigate('/')
+            }).catch((err) => {
+              console.log('error')
+              Swal.fire({
+                title: 'Error!',
+                text: 'please recheck credentials',
+                icon: 'error',
+                confirmButtonText: 'ok'
+              })
+            })
+          }
+    }
   function handleChange(e) {
+    setErrorMessage8(null)
     setApplication({ ...application, [e.target.name]: e.target.value })
   }
 
@@ -150,7 +191,7 @@ function Form() {
                   </label>
                   <input
                     type="text"
-                    name='name' onChange={(e) => handleChange(e)}
+                    name='name' onBlur={()=>validateName()} onChange={(e) => handleChange(e)}
                     id="name"
                     className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  dark:bg-gray-200 dark:border-gray-600 dark:placeholder-gray-400   dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light"
                     placeholder=""
@@ -171,7 +212,7 @@ function Form() {
                   </label>
                   <input
 
-                    name='address' onChange={(e) => handleChange(e)}
+                    name='address' onBlur={()=>validateAddress()} onChange={(e) => handleChange(e)}
                     type="text"
                     id="address"
                     className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  dark:bg-gray-200 dark:border-gray-600 dark:placeholder-gray-400   dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light"
@@ -193,7 +234,7 @@ function Form() {
                     City*
                   </label>
                   <input
-                    name='city' onChange={(e) => handleChange(e)}
+                    name='city' onBlur={()=>validateCity()} onChange={(e) => handleChange(e)}
                     type="text"
 
                     id="city"
@@ -212,7 +253,7 @@ function Form() {
                     State*
                   </label>
                   <input
-                    name='state' onChange={(e) => handleChange(e)}
+                    name='state' onBlur={()=>validateState()} onChange={(e) => handleChange(e)}
                     type="text"
 
                     id="state"
@@ -235,7 +276,7 @@ function Form() {
                   <input
 
                     type="email"
-                    name='email' onChange={(e) => handleChange(e)}
+                    name='email' onBlur={()=>validateEmail()} onChange={(e) => handleChange(e)}
                     id="email"
                     className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  dark:bg-gray-200 dark:border-gray-600 dark:placeholder-gray-400   dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light"
                     placeholder=""
@@ -253,7 +294,7 @@ function Form() {
                   </label>
                   <input
                     type="number"
-                    name='phone' onChange={(e) => handleChange(e)}
+                    name='phone' onBlur={()=>validatePhone()} onChange={(e) => handleChange(e)}
                     id="phone"
                     className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  dark:bg-gray-200 dark:border-gray-600 dark:placeholder-gray-400   dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light"
                     required=""
@@ -274,7 +315,7 @@ function Form() {
                   </label>
                   <input
                     type="text"
-                    name='company_name' onChange={(e) => handleChange(e)}
+                    name='company_name' onBlur={()=>validateCompanyName()} onChange={(e) => handleChange(e)}
                     id="company"
                     className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  dark:bg-gray-200 dark:border-gray-600 dark:placeholder-gray-400   dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light"
                     placeholder=""
@@ -294,6 +335,7 @@ function Form() {
                   <input
                     type="file"
                     id="image"
+                    onBlur={()=>validateimage()}
                     onChange={(e) => { setImage(e.target.files[0]) }}
                     className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  dark:bg-gray-200 dark:border-gray-600 dark:placeholder-gray-400   dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light"
                     required=""

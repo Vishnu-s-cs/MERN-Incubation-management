@@ -115,6 +115,7 @@ function BookingSlot() {
           let { val, index } = indexof
           val[index].isBooked = true
           setModal(false)
+          setselected(0)
         } else {
           setErrorMessage('Something went wrong')
         }
